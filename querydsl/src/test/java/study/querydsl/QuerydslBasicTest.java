@@ -20,6 +20,7 @@ public class QuerydslBasicTest {
     @PersistenceContext
     EntityManager em;
 
+
     @BeforeEach
     public void beforeEach() {
         Team teamA = new Team("teamA");

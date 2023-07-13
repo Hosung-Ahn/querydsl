@@ -13,6 +13,7 @@ import study.querydsl.entitiy.QMember;
 import study.querydsl.entitiy.Team;
 
 import static org.assertj.core.api.Assertions.*;
+import static study.querydsl.entitiy.QMember.*;
 
 @SpringBootTest
 @Transactional
@@ -53,11 +54,10 @@ public class QuerydslBasicTest {
     @Test
     public void startQuerydsl() {
         JPAQueryFactory jpaQueryFactory = new JPAQueryFactory(em);
-        QMember m = new QMember("m");
 
         Member result = jpaQueryFactory
-                .selectFrom(m)
-                .where(m.username.eq("member1"))
+                .selectFrom(member)
+                .where(member.username.eq("member1"))
                 .fetchOne();
         assertThat(result.getUsername()).isEqualTo("member1");
     }

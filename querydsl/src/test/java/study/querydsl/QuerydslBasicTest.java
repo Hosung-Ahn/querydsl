@@ -12,6 +12,8 @@ import study.querydsl.entitiy.Member;
 import study.querydsl.entitiy.QMember;
 import study.querydsl.entitiy.Team;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.*;
 import static study.querydsl.entitiy.QMember.*;
 
@@ -20,10 +22,11 @@ import static study.querydsl.entitiy.QMember.*;
 public class QuerydslBasicTest {
     @PersistenceContext
     EntityManager em;
-
+    JPAQueryFactory query;
 
     @BeforeEach
     public void beforeEach() {
+        query = new JPAQueryFactory(em);
         Team teamA = new Team("teamA");
         Team teamB = new Team("teamB");
 
@@ -53,12 +56,42 @@ public class QuerydslBasicTest {
 
     @Test
     public void startQuerydsl() {
-        JPAQueryFactory jpaQueryFactory = new JPAQueryFactory(em);
-
-        Member result = jpaQueryFactory
+        Member result = query
                 .selectFrom(member)
                 .where(member.username.eq("member1"))
                 .fetchOne();
         assertThat(result.getUsername()).isEqualTo("member1");
+    }
+
+    @Test
+    public void select() {
+        Member result = query
+                .selectFrom(member)
+                .where(member.username.eq("member1").and(member.age.eq(10)))
+                .fetchOne();
+        assertThat(result.getUsername()).isEqualTo("member1");
+
+        List<Member> findMembers = query
+                .selectFrom(member)
+                .where(member.age.between(10, 30))
+                .fetch();
+
+        assertThat(findMembers.size()).isEqualTo(3);
+    }
+
+    @Test
+    public void searchAndParam() {
+        Member result1 = query
+                .selectFrom(member)
+                .where(member.username.eq("member1"),
+                        member.age.eq(10))
+                .fetchOne();
+
+        Member result2 = query
+                .selectFrom(member)
+                .where(member.username.eq("member1").and(member.age.eq(10)))
+                .fetchOne();
+
+        assertThat(result1.getUsername()).isEqualTo(result2.getUsername());
     }
 }

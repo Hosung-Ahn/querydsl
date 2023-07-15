@@ -3,18 +3,19 @@ package study.querydsl;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 import study.querydsl.entitiy.Member;
+import com.querydsl.core.NonUniqueResultException;
 import study.querydsl.entitiy.QMember;
 import study.querydsl.entitiy.Team;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static study.querydsl.entitiy.QMember.*;
 
 @SpringBootTest
@@ -93,5 +94,36 @@ public class QuerydslBasicTest {
                 .fetchOne();
 
         assertThat(result1.getUsername()).isEqualTo(result2.getUsername());
+    }
+
+    @Test
+    public void resultFetch() {
+        // fetch
+        List<Member> members = query
+                .selectFrom(member)
+                .fetch();
+        assertThat(members.size()).isEqualTo(4);
+
+        // fetchOne - 결과 값이 1개
+        Member member1 = query
+                .selectFrom(member)
+                .where(member.username.eq("member1"))
+                .fetchOne();
+        assertThat(member1.getUsername()).isEqualTo("member1");
+
+        // fetchOne - 결과 값이 2개 이상
+        assertThrows(
+                NonUniqueResultException.class, () -> {
+                    query
+                            .selectFrom(member)
+                            .fetchOne();
+                }
+        );
+
+        // fetchFirst
+        Member memberFirst = query
+                .selectFrom(member)
+                .fetchFirst();
+        System.out.println("get first member : " + memberFirst);
     }
 }

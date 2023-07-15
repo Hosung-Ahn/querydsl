@@ -148,6 +148,38 @@ public class QuerydslBasicTest {
         for (Member result : results) {
             System.out.println(result);
         }
+    }
 
+    @Test
+    public void paging1() {
+        List<Member> members = query
+                .selectFrom(member)
+                .orderBy(member.username.asc())
+                .offset(1)
+                .limit(2)
+                .fetch();
+
+        assertThat(members.size()).isEqualTo(2);
+
+        for (Member member : members) {
+            System.out.println(member);
+        }
+
+
+
+        em.persist(new Member("member0", 10));
+
+        members = query
+                .selectFrom(member)
+                .orderBy(member.username.asc())
+                .offset(1)
+                .limit(2)
+                .fetch();
+
+        for (Member member : members) {
+            System.out.println(member);
+        }
+
+        assertThat(members.size()).isEqualTo(2);
     }
 }

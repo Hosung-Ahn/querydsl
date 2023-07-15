@@ -126,4 +126,28 @@ public class QuerydslBasicTest {
                 .fetchFirst();
         System.out.println("get first member : " + memberFirst);
     }
+
+    /**
+     * 회원정렬순서
+     * 1. 회원 나이 내림차순(desc)
+     * 2. 회원 이름 오름차순(asc)
+     * 단 2에서 회원 이름이 없으면 마지막에 출력 (nulls last)
+     */
+    @Test
+    public void sort() {
+        em.persist(new Member("member5", 100));
+        em.persist(new Member("member8", 100));
+        em.persist(new Member(null, 200));
+        em.persist(new Member("member7", 200));
+
+        List<Member> results = query
+                .selectFrom(member)
+                .orderBy(member.age.desc(), member.username.asc().nullsLast())
+                .fetch();
+
+        for (Member result : results) {
+            System.out.println(result);
+        }
+
+    }
 }

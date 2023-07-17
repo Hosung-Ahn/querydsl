@@ -275,4 +275,55 @@ public class QuerydslBasicTest {
                 .extracting("username")
                 .containsExactly("teamA", "teamB");
     }
+
+    /**
+     * 회원을 모두 조회한다. 그리고 team 이름이 "teamA" 인 team 만 조인한다.
+     */
+    @Test
+    public void join_on() {
+        List<Tuple> result = query
+                .select(member, team)
+                .from(member)
+                .leftJoin(member.team, team)
+                .on(team.name.eq("teamA"))
+                .fetch();
+
+        for (Tuple tuple : result) {
+            System.out.println(tuple);
+        }
+
+    }
+    /**
+     * member 의 이름과 team의 이름이 같은 member를 모두 조회하기
+     */
+    @Test
+    public void join_on_no_relation(){
+        em.persist(new Member("teamA"));
+        em.persist(new Member("teamB"));
+        em.persist(new Member("teamC"));
+
+        List<Tuple> result = query
+                .select(member, team)
+                .from(member)
+                .leftJoin(team).on(member.username.eq(team.name))
+                .fetch();
+
+        for (Tuple tuple : result) {
+            System.out.println(tuple);
+        }
+    }
+
+    @Test
+    public void select_one() {
+        List<Member> result = query
+                .selectFrom(member)
+                .leftJoin(member.team, team)
+                .on(team.name.eq("teamA"))
+                .fetch();
+
+        for (Member member1 : result) {
+            System.out.println(member1);
+            System.out.println(member1.getTeam());
+        }
+    }
 }

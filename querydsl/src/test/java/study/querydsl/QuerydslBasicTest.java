@@ -3,6 +3,7 @@ package study.querydsl;
 import com.querydsl.core.QueryFactory;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.dsl.CaseBuilder;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -16,6 +17,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 import study.querydsl.entitiy.Member;
 import com.querydsl.core.NonUniqueResultException;
+import study.querydsl.entitiy.Number;
 import study.querydsl.entitiy.QMember;
 import study.querydsl.entitiy.QTeam;
 import study.querydsl.entitiy.Team;
@@ -468,6 +470,53 @@ public class QuerydslBasicTest {
 
         for (Tuple tuple : result) {
             System.out.println(tuple);
+        }
+    }
+
+    @Test
+    public void constant() {
+        List<Tuple> result = query
+                .select(member.username, Expressions.constant("A"))
+                .from(member)
+                .fetch();
+
+        for (Tuple tuple : result) {
+            System.out.println(tuple);
+        }
+    }
+
+    @Test
+    public void concat() {
+        //기대값 : {username}_{age}
+        List<String> result = query
+                .select(member.username.concat("_").concat(member.age.stringValue()))
+                .from(member)
+                .fetch();
+
+        for (String s : result) {
+            System.out.println(s);
+        }
+    }
+
+    @Test
+    public void getEnumValue() {
+        Member memberEnum = new Member("member_enum");
+        memberEnum.setNumber(Number.ONE);
+        em.persist(memberEnum);
+
+        // 초기화
+        em.flush();
+        em.clear();
+
+        // 조회
+        List<String> result = query
+                .select(member.username.concat("_").concat(member.number.stringValue()))
+                .from(member)
+                .where(member.username.eq("member_enum"))
+                .fetch();
+
+        for (String s : result) {
+            System.out.println(s);
         }
     }
 }

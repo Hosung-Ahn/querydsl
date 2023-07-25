@@ -2,6 +2,7 @@ package study.querydsl;
 
 import com.querydsl.core.QueryFactory;
 import com.querydsl.core.Tuple;
+import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPAExpressions;
@@ -15,6 +16,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
+import study.querydsl.dto.MemberDto;
 import study.querydsl.entitiy.Member;
 import com.querydsl.core.NonUniqueResultException;
 import study.querydsl.entitiy.Number;
@@ -538,5 +540,53 @@ public class QuerydslBasicTest {
         }
     }
 
-    
+    @Test
+    public void findDtoByJPQL() {
+        List<MemberDto> resultList = em.createQuery("select new study.querydsl.dto.MemberDto(m.username, m.age) " +
+                "from Member m", MemberDto.class).getResultList();
+
+        for (MemberDto memberDto : resultList) {
+            System.out.println(memberDto);
+        }
+    }
+
+    @Test
+    public void DtoQuerydslSetter() {
+        List<MemberDto> result = query
+                .select(Projections.bean(MemberDto.class,
+                        member.username,
+                        member.age))
+                .from(member)
+                .fetch();
+
+        for (MemberDto memberDto : result) {
+            System.out.println(memberDto);
+        }
+    }
+    @Test
+    public void DtoQuerydslField() {
+        List<MemberDto> result = query
+                .select(Projections.fields(MemberDto.class,
+                        member.username,
+                        member.age))
+                .from(member)
+                .fetch();
+
+        for (MemberDto memberDto : result) {
+            System.out.println(memberDto);
+        }
+    }
+    @Test
+    public void DtoQuerydslConstructor() {
+        List<MemberDto> result = query
+                .select(Projections.constructor(MemberDto.class,
+                        member.username,
+                        member.age))
+                .from(member)
+                .fetch();
+
+        for (MemberDto memberDto : result) {
+            System.out.println(memberDto);
+        }
+    }
 }

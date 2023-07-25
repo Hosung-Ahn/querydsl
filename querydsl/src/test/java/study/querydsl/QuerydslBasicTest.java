@@ -519,4 +519,24 @@ public class QuerydslBasicTest {
             System.out.println(s);
         }
     }
+
+    @Test
+    public void simple_projection() {
+        List<String> result = query.select(member.username)
+                .from(member)
+                .fetch();
+    }
+
+    @Test
+    public void tuple_projection() {
+        List<Tuple> result = query.select(member.username, member.age)
+                .from(member)
+                .fetch();
+        for (Tuple tuple : result) {
+            System.out.println(tuple.get(member.username));
+            System.out.println(tuple.get(member.age));
+        }
+    }
+
+    
 }

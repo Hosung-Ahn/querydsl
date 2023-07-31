@@ -653,7 +653,28 @@ public class QuerydslBasicTest {
         return member.age.eq(age);
     }
 
-    private BooleanExpression isAllSaved(String username, Integer age) {
-        
+    @Test
+    public void bulkUpdate() {
+        long count = query.update(member)
+                .set(member.username, "비회원")
+                .where(member.age.gt(20))
+                .execute();
+        System.out.println(count);
+
+        em.flush();
+        em.clear();
+
+        List<Member> result = query.selectFrom(member)
+                .fetch();
+        for (Member member1 : result) {
+            System.out.println(member1);
+        }
+    }
+
+    @Test
+    public void bulkAdd() {
+        query.update(member)
+                .set(member.age, member.age.add(1))
+                .execute();
     }
 }
